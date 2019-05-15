@@ -5,14 +5,30 @@ import checkConnectivity from '/js/connection.js';
 var uniqid = function() {
   return (new Date().getTime() + Math.floor((Math.random()*10000)+1)).toString(16);
 };
+var online  = true;
+var queue = [];
+
 
 async function deleteIdbTask(database,task) {
   var tasks = await database.get('tasks', 'tasks');
-  tasks = tasks.filter( item => item.id != task.task)
-  // console.log('deleteIdbTask',task.task)
-  console.log('deleteIdbTaskb tasks',tasks)
+  var myHeaders = new Headers();
+  var myInit = { method: 'DELETE',
+    headers: myHeaders,
+    mode: 'cors',
+  };
+
+  tasks = tasks.filter( item => item.id != task.id);
   await database.put('tasks', tasks, 'tasks');
 
+  if(online) {
+    fetch(`http://localhost:3000/tasks/${task.id}`,myInit)
+      .then(function(response) {
+        return response.blob();
+      });
+  } else {
+    // add queue
+    queue.push({type:'delete',id:task.id});
+  }
 }
 
 (async function(document) {
@@ -33,16 +49,22 @@ async function deleteIdbTask(database,task) {
       description.value);
 
     listPage.appendChild(taskElement);
-    console.log('addTask nn', taskElement.id)
 
-    fetch('http://localhost:3000/tasks', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({id:taskElement.id ,title: title.value, description:  description.value})
-    });
+    const newTask = {id:taskElement.id ,title: title.value, description:  description.value};
+
+    if(online) {
+      fetch('http://localhost:3000/tasks', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newTask)
+      });
+    } else {
+      // add queue
+      queue.push({type:'add',task : newTask});
+    }
 
     title.value = '';
     description.value = '';
@@ -50,7 +72,37 @@ async function deleteIdbTask(database,task) {
   };
   
   document.addEventListener('connection-changed', ({ detail }) => {
-    console.log(detail.online);
+    console.log('online',detail.online);
+    online = detail.online;
+
+    if(online){
+      queue.map(item => {
+        if(item.type == 'delete'){
+          var myHeaders = new Headers();
+          var myInit = { method: 'DELETE',
+            headers: myHeaders,
+            mode: 'cors',
+          };
+          fetch(`http://localhost:3000/tasks/${item.id}`,myInit)
+            .then(function(response) {
+              return response.blob();
+            });
+        }
+        if(item.type == 'add'){
+          fetch('http://localhost:3000/tasks', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(item.task)
+          });
+        }
+
+      });
+
+      queue = [];
+    }
   });
   skeleton.removeAttribute('active');
   listPage.setAttribute('active', '');
@@ -67,9 +119,7 @@ async function deleteIdbTask(database,task) {
     });
 
     document.addEventListener('task-deleted', function (e) {
-      console.log('task deleted',e.detail)
       deleteIdbTask(database,e.detail);
-
     }, false);
 
 
@@ -113,18 +163,21 @@ async function deleteIdbTask(database,task) {
     });
     const tasks = await database.get('tasks', 'tasks');
     console.log('value >',tasks)
-    // console.error(error, ':(');
-    tasks.map(item => {
-      const taskElement = new AppTask();
 
-      taskElement.initTask(
-        item.title,
-        item.description);
+    if(tasks){
+      tasks.map(item => {
+        const taskElement = new AppTask();
 
-      listPage.appendChild(taskElement);
+        taskElement.initTask(
+          item.title,
+          item.description);
 
-      return taskElement;
-    });
+        listPage.appendChild(taskElement);
+
+        return taskElement;
+      });
+    }
+
 
   }
 })(document);

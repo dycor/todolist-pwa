@@ -144,26 +144,16 @@ export default class AppTask extends LitElement {
   }
 
   delete(){
-    var myHeaders = new Headers();
-
-    var myInit = { method: 'DELETE',
-      headers: myHeaders,
-      mode: 'cors',
-    };
     this.remove();
 
     const event = new CustomEvent("task-deleted", {
       detail: {
-        task: this.id
+        id: this.id,
+        title: this.title,
+        description: this.description,
       }
     });
     document.dispatchEvent(event);
-
-    console.log('suppression id ',this.id)
-    fetch(`http://localhost:3000/tasks/${this.id}`,myInit)
-      .then(function(response) {
-        return response.blob();
-      });
   }
 }
 

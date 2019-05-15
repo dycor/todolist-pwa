@@ -27,20 +27,16 @@ self.__precacheManifest = [
     "revision": "538fbb8102370bb67e6eefe79028fe68"
   },
   {
-    "url": "data/tasks.json",
-    "revision": "e8e1451a119731c40b9578eb789ae5c1"
-  },
-  {
     "url": "index.html",
-    "revision": "d2c93259419d8f48518faccc037f34b8"
+    "revision": "0f26186afdbad2d7b17afdd930f3c373"
   },
   {
     "url": "js/app.js",
-    "revision": "ff4d1d8b8ebb8dc8599b00183810ce3c"
+    "revision": "f08cbde1bb26153a59fa004fbf6eeeaa"
   },
   {
     "url": "js/components/task/task.js",
-    "revision": "d9cbeabae36964834ee67bc98ae728cf"
+    "revision": "7b9a4ec516b957281f476cef12201635"
   },
   {
     "url": "js/connection.js",
@@ -52,7 +48,7 @@ self.__precacheManifest = [
   },
   {
     "url": "styles/main.css",
-    "revision": "06d0f65582580073657705ffb6c13811"
+    "revision": "3a22945e85fce6a68ca1b1f596bafea2"
   },
   {
     "url": "node_modules/idb/build/esm/index.js",
