@@ -162,7 +162,6 @@ async function deleteIdbTask(database,task) {
       }
     });
     const tasks = await database.get('tasks', 'tasks');
-    console.log('value >',tasks)
 
     if(tasks){
       tasks.map(item => {

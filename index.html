@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="theme-color" content="#FFFFFF">
   <link rel="manifest" href="manifest.json">
-  <title>My First PWA</title>
+  <title>To do list</title>
   <style>
     * {
       box-sizing: border-box;
@@ -99,6 +99,16 @@
       border-radius: 0.5rem;
     }
 
+    .task-form {
+      display: inline-grid;
+      padding: 2.5rem;
+      text-align: center;
+    }
+
+    .task-form > * {
+      margin: 1rem;
+    }
+
     @keyframes loading {
       100% {
         transform: translateX(100%);
@@ -130,11 +140,11 @@
       </div>
 
       <section page="list">
-        <div style="display: inline-grid; padding: 2.5rem;text-align: center;">
+        <div class="task-form">
           <label>Ajoutez une tâche</label>
-          <input id="task-title" type="text" placeholder="titre" style="margin: 1rem">
-          <textarea id="task-description" rows="4" cols="50" placeholder="description" style="margin: 1rem"></textarea>
-          <button id="task-btn" class="btn-valid" style="margin: 1rem">+</button>
+          <input id="task-title" type="text" placeholder="titre">
+          <textarea id="task-description" rows="4" cols="50" placeholder="description" ></textarea>
+          <button id="task-btn" class="btn-valid" >+</button>
         </div>
         <div class="ctn"></div></section>
       <section page="view"></section>
