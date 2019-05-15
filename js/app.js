@@ -1,30 +1,21 @@
 import AppTask from '/js/components/task/task.js';
 import { openDB } from 'idb';
 import checkConnectivity from '/js/connection.js';
-
+import { deleteTask, postTask } from '../api/task';
 var uniqid = function() {
   return (new Date().getTime() + Math.floor((Math.random()*10000)+1)).toString(16);
 };
 var online  = true;
 var queue = [];
 
-
 async function deleteIdbTask(database,task) {
   var tasks = await database.get('tasks', 'tasks');
-  var myHeaders = new Headers();
-  var myInit = { method: 'DELETE',
-    headers: myHeaders,
-    mode: 'cors',
-  };
 
   tasks = tasks.filter( item => item.id != task.id);
   await database.put('tasks', tasks, 'tasks');
 
   if(online) {
-    fetch(`http://localhost:3000/tasks/${task.id}`,myInit)
-      .then(function(response) {
-        return response.blob();
-      });
+    deleteTask(task.id)
   } else {
     // add queue
     queue.push({type:'delete',id:task.id});
@@ -34,6 +25,7 @@ async function deleteIdbTask(database,task) {
 (async function(document) {
   const app = document.querySelector('#app');
   const skeleton = app.querySelector('.skeleton');
+  const banner = app.querySelector('.disconnected');
   const listPage = app.querySelector('[page=list]');
   const btnAdd = app.querySelector('#task-btn');
 
@@ -53,14 +45,7 @@ async function deleteIdbTask(database,task) {
     const newTask = {id:taskElement.id ,title: title.value, description:  description.value};
 
     if(online) {
-      fetch('http://localhost:3000/tasks', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newTask)
-      });
+      postTask(newTask);
     } else {
       // add queue
       queue.push({type:'add',task : newTask});
@@ -78,30 +63,20 @@ async function deleteIdbTask(database,task) {
     if(online){
       queue.map(item => {
         if(item.type == 'delete'){
-          var myHeaders = new Headers();
-          var myInit = { method: 'DELETE',
-            headers: myHeaders,
-            mode: 'cors',
-          };
-          fetch(`http://localhost:3000/tasks/${item.id}`,myInit)
-            .then(function(response) {
-              return response.blob();
-            });
+          deleteTask(item.id);
         }
         if(item.type == 'add'){
-          fetch('http://localhost:3000/tasks', {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(item.task)
-          });
+          postTask(item.task);
         }
 
       });
 
       queue = [];
+
+      banner.removeAttribute('active');
+
+    } else {
+      banner.setAttribute('active','');
     }
   });
   skeleton.removeAttribute('active');

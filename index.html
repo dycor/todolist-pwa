@@ -57,6 +57,13 @@
       display: none;
     }
     [active] { display: block !important; }
+
+    .disconnected {
+      display: none;
+      color: white;
+      background-color: #710e15;
+      text-align: center;
+    }
     /* Skeleton */
     .skeleton {
       position: relative;
@@ -132,6 +139,9 @@
         <span class="title"><a href="/">To do list</a></span>
       </nav>
     </header>
+    <div class="disconnected">
+      Non connecté ...
+    </div>
     <main>
       <div class="skeleton" active>
         <div class="hero"></div>
