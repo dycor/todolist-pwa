@@ -61,15 +61,17 @@ async function deleteIdbTask(database,task) {
     online = detail.online;
 
     if(online){
-      queue.map(item => {
-        if(item.type == 'delete'){
-          deleteTask(item.id);
-        }
-        if(item.type == 'add'){
-          postTask(item.task);
-        }
+      if(queue.length > 0) {
+        queue.map(item => {
+          if(item.type == 'delete'){
+            deleteTask(item.id);
+          }
+          if(item.type == 'add'){
+            postTask(item.task);
+          }
 
-      });
+        });
+      }
 
       queue = [];
 
